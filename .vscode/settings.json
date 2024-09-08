@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "fcntl.h": "c",
+        "io.h": "c",
+        "stdio.h": "c",
+        "commandmanager.h": "c",
+        "string.h": "c",
+        "winsock2.h": "c"
+    }
+}
