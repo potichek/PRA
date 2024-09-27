@@ -9,13 +9,14 @@
 #include <io.h>
 #include <fcntl.h>
 
-#define MAX_SIZE_C 200000
-#define MAX_SIZE_W 200000
+#define MAX_SIZE 200000
 
 int main()
 {
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
+
+    _putws(L"The author of this program: Potichek.\nGithub: https://github.com/potichek\nDiscord: https://discord.gg/wE5SftnWct");
 
     WSADATA ws;
     WSAStartup(MAKEWORD(2, 2), &ws);
@@ -31,8 +32,8 @@ int main()
     bind(soc, (const struct sockaddr *) &sai, sizeof(sai));
     listen(soc, 100);
 
-    wchar_t dataw[MAX_SIZE_W];
-    char datac[MAX_SIZE_C];
+    wchar_t dataw[MAX_SIZE];
+    char datac[MAX_SIZE];
 
     memset(dataw, 0, sizeof(dataw));
     memset(datac, 0, sizeof(datac));
@@ -47,7 +48,7 @@ int main()
         while (1)
         {
             _putws(L"Enter command: ");
-            fgetws(dataw, MAX_SIZE_W, stdin);
+            fgetws(dataw, MAX_SIZE, stdin);
 
             int nibites = WideCharToMultiByte(CP_UTF8, 0, (const wchar_t *) dataw, -1, NULL, 0, NULL, NULL);
             int iconverted = WideCharToMultiByte(

