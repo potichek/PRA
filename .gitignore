@@ -1,3 +1,7 @@
 .vscode/
-/src/client/*.exe
-/src/server/*.exe
+
+client/*.exe
+
+server/*.exe
+
+packer/*.exe

