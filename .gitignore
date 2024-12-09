@@ -1,7 +1,5 @@
 .vscode/
 
-client/*.exe
-
-server/*.exe
-
-packer/*.exe
+client/*.o
+server/*.o
+packer/*.o

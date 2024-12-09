@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <windows.h>
 
-#include "commandmanager.h"
+#include "commandservice.h"
 
 #define MAX_SIZE 200000
 

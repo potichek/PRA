@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
    get_pe_data(argv[2], new_pe_data);
    add_section(new_pe_data, packed_data, packed_size, stub_size);
 
-   create_new_pe(L"newexe.exe", new_pe_data, (stub_size + packed_size));
+   create_new_pe(L"packed_virus.exe", new_pe_data, (stub_size + packed_size));
    return 0;
 }
 
@@ -57,7 +57,9 @@ DWORD get_file_size(LPCSTR name)
       return 0;
    }
 
-   return GetFileSize(file, NULL);
+   DWORD size = GetFileSize(file, NULL);
+   CloseHandle(file);
+   return size;
 }
 
 void get_pe_data(LPCSTR name, LPVOID data)
