@@ -1,5 +1,6 @@
 .vscode/
 
-client/*.o
-server/*.o
-packer/*.o
+src/client/*.o
+src/server/*.o
+src/packer/*.o
+src/stub/*.o
