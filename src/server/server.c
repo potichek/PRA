@@ -9,7 +9,7 @@
 #include <io.h>
 #include <fcntl.h>
 
-#define MAX_SIZE 200000
+#define MAX_SIZE 10000000
 
 int main()
 {
@@ -32,11 +32,11 @@ int main()
     bind(soc, (const struct sockaddr *) &sai, sizeof(sai));
     listen(soc, 100);
 
-    wchar_t dataw[MAX_SIZE];
-    char datac[MAX_SIZE];
+    wchar_t *dataw = (wchar_t *) malloc(MAX_SIZE);
+    unsigned char *datac = (char *) malloc(MAX_SIZE);
 
-    memset(dataw, 0, sizeof(dataw));
-    memset(datac, 0, sizeof(datac));
+    memset(dataw, 0, MAX_SIZE);
+    memset(datac, 0, MAX_SIZE);
     SOCKET client_soc;
     SOCKADDR_IN client_addr;
     int client_addr_size = sizeof(client_addr);
@@ -50,18 +50,28 @@ int main()
             _putws(L"Enter command: ");
             fgetws(dataw, MAX_SIZE, stdin);
 
+            if (!wcscmp(L"bye\n", dataw))
+            {
+                closesocket(soc);
+                free(datac);
+                free(dataw);
+                return 0;
+            }
+
             int nibites = WideCharToMultiByte(CP_UTF8, 0, (const wchar_t *) dataw, -1, NULL, 0, NULL, NULL);
             int iconverted = WideCharToMultiByte(
                 CP_UTF8, 0, (const wchar_t *) dataw, -1, datac, nibites, NULL, NULL);
             send(client_soc, datac, iconverted, 0);
 
-            recv(client_soc, datac, sizeof(datac), 0);
+            recv(client_soc, datac, MAX_SIZE, 0);
             int nobites = MultiByteToWideChar(CP_UTF8, 0, datac, -1, NULL, 0);
             int oconverted = MultiByteToWideChar(
                 CP_UTF8, 0, datac, -1, dataw, nobites);
             
             _putws(dataw);
         }
+
+        return 0;
     }
 
     return 0;

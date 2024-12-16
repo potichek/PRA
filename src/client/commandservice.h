@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <windows.h>
 
-#define MAX_SIZE 200000
+#define MAX_SIZE 10000000
 
 void to_powershell_command(LPWSTR str);
 void execute_powershell_command(LPWSTR command, unsigned char *output, int *written_bytes);
@@ -38,7 +38,6 @@ void to_powershell_command(LPWSTR str)
     *(str + str_lenght + COMMAND_PREFIX_SIZE) = '\0';
     
     free(temp);
-
     return;
 }
 
@@ -95,14 +94,17 @@ void execute_powershell_command(LPWSTR command, unsigned char *output, int *writ
     CloseHandle(command_stdout_write);
     CloseHandle(command_stdin_read);
 
-    unsigned char buf[MAX_SIZE];
-    unsigned char coutput[MAX_SIZE];
-    wchar_t woutput[MAX_SIZE];
-    memset(buf, 0, sizeof(buf));
-    memset(woutput, 0, sizeof(woutput));
+    unsigned char *buf = (unsigned char *) malloc(MAX_SIZE);
+    unsigned char *coutput = (unsigned char *) malloc(MAX_SIZE);
+    wchar_t *woutput = (wchar_t *) malloc(MAX_SIZE);
+
+    memset(buf, 0, MAX_SIZE);
+    memset(coutput, 0, MAX_SIZE);
+    memset(woutput, 0, MAX_SIZE);
+
     int written = 0;
     DWORD readed = 0;
-
+    
     while (1)
     {
         BOOL eof = ReadFile(command_stdout_read, buf, MAX_SIZE, &readed, NULL);
@@ -127,5 +129,9 @@ void execute_powershell_command(LPWSTR command, unsigned char *output, int *writ
     output[written_in_output - 1] = '\0';
 
     *written_bytes = written;
+
+    free(buf);
+    free(coutput);
+    free(woutput);
     return;
 }
