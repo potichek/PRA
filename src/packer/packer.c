@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
       return 1;
    }
 
+
    DWORD packed_size = get_file_size(argv[1]);
    LPVOID packed_data = malloc(packed_size);
    get_pe_data(argv[1], packed_data);
@@ -148,7 +149,6 @@ void add_section(LPVOID data, LPVOID section_data, DWORD section_size, DWORD stu
    DWORD raw_offset = align(previous_section->SizeOfRawData + previous_section->PointerToRawData, file_alignment);
    unsigned long long temp = (unsigned long long) raw_offset;
    pointer = (BYTE *) data + temp;
-
 
    memcpy(new_section->Name, ".packed", 8);
    new_section->Misc.VirtualSize = section_size;

@@ -43,11 +43,6 @@ DWORD align(DWORD value, DWORD alignment)
 void create_path()
 {
    BOOL result = CreateDirectory(L"C:\\Systems", NULL);
-
-   if (!result)
-   {
-      printf("Error of creating directory: %d\n", GetLastError());
-   }
    return;
 }
 

