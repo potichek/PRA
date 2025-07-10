@@ -16,7 +16,7 @@ int main()
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
 
-    _putws(L"The author of this program: Potichek.\nGithub: https://github.com/potichek\nDiscord: https://discord.gg/wE5SftnWct");
+    _putws(L"The author of this program: Potichek.\nGithub: https://github.com/potichek\n");
 
     WSADATA ws;
     WSAStartup(MAKEWORD(2, 2), &ws);

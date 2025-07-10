@@ -8,31 +8,31 @@
 
 void get_pe_data(LPCSTR name, LPVOID data);
 DWORD get_file_size(LPCSTR name);
-void create_new_pe(LPCWSTR name, LPVOID data, DWORD size);
-void add_section(LPVOID data, LPVOID section_data, DWORD section_size, DWORD stub_size);
+void create_new_pe(LPCSTR name, LPVOID data, DWORD size);
+void add_section(LPVOID data, LPVOID section_data, DWORD section_size, DWORD stub_size, const CHAR* section_name);
 DWORD align(DWORD value, DWORD alignment);
 
 int main(int argc, char *argv[])
 {
 
-   if (argc < 3)
+   if (argc != 5)
    {
       printf("Specify the name of the stub and dummy\n");
-      printf("<dummy> <stub>\n");
+      printf("<stub> <dummy> <output file name> <packed section name>\n");
       return 1;
    }
 
 
-   DWORD packed_size = get_file_size(argv[1]);
+   DWORD packed_size = get_file_size(argv[2]);
    LPVOID packed_data = malloc(packed_size);
-   get_pe_data(argv[1], packed_data);
+   get_pe_data(argv[2], packed_data);
 
-   DWORD stub_size = get_file_size(argv[2]);
+   DWORD stub_size = get_file_size(argv[1]);
    LPVOID new_pe_data = malloc(stub_size + packed_size);
-   get_pe_data(argv[2], new_pe_data);
-   add_section(new_pe_data, packed_data, packed_size, stub_size);
+   get_pe_data(argv[1], new_pe_data);
+   add_section(new_pe_data, packed_data, packed_size, stub_size, argv[4]);
 
-   create_new_pe(L"packed_virus.exe", new_pe_data, (stub_size + packed_size));
+   create_new_pe(argv[3], new_pe_data, (stub_size + packed_size));
    return 0;
 }
 
@@ -96,9 +96,9 @@ void get_pe_data(LPCSTR name, LPVOID data)
    return;
 }
 
-void create_new_pe(LPCWSTR name, LPVOID data, DWORD size)
+void create_new_pe(LPCSTR name, LPVOID data, DWORD size)
 {
-   HANDLE file = CreateFile(
+   HANDLE file = CreateFileA(
       name,
       GENERIC_WRITE,
       FILE_SHARE_WRITE, 
@@ -125,7 +125,7 @@ void create_new_pe(LPCWSTR name, LPVOID data, DWORD size)
    return;
 }
 
-void add_section(LPVOID data, LPVOID section_data, DWORD section_size, DWORD stub_size)
+void add_section(LPVOID data, LPVOID section_data, DWORD section_size, DWORD stub_size, const CHAR* section_name)
 {
    BYTE *pointer = (BYTE *) data;
    PIMAGE_DOS_HEADER dos_header = (PIMAGE_DOS_HEADER) pointer;
@@ -150,7 +150,10 @@ void add_section(LPVOID data, LPVOID section_data, DWORD section_size, DWORD stu
    unsigned long long temp = (unsigned long long) raw_offset;
    pointer = (BYTE *) data + temp;
 
-   memcpy(new_section->Name, ".packed", 8);
+   CHAR section_name_size = 0;
+   for (; *(section_name + section_name_size) != '\0'; section_name_size++);
+
+   memcpy(new_section->Name, section_name, section_name_size);
    new_section->Misc.VirtualSize = section_size;
    new_section->VirtualAddress = virtual_offset;
    new_section->SizeOfRawData = align(section_size + sizeof(size_t), file_alignment);
