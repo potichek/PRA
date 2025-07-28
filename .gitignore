@@ -4,3 +4,9 @@ src/client/*.o
 src/server/*.o
 src/packer/*.o
 src/stub/*.o
+src/defender/.vs/
+src/defender/x64/Release/defender/
+src/defender/x64/Release/defender.tlog/
+src/defender/x64/Release/defender.log
+src/defender/x64/Release/defender.sys.recipe
+src/defender/x64/Release/defender.vcxproj.FileListAbsolute.txt
